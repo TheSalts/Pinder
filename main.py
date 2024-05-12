@@ -11,7 +11,7 @@ read_count: int = 0
 search_data: list[str | object] = []
 
 
-def drop_handler(event):
+def drop_handler(event) -> None:
     global total_count
     event.preventDefault()
     event.stopPropagation()
@@ -27,16 +27,16 @@ def drop_handler(event):
             read_file(entry)
 
 
-def is_pdf(filename):
+def is_pdf(filename: str) -> bool:
     _, ext = os.path.splitext(filename)
     return ext.lower() == ".pdf"
 
 
-def get_directory_entries(entry):
+def get_directory_entries(entry) -> None:
     entry.createReader().readEntries(create_proxy(get_entries))
 
 
-def get_entries(entries):
+def get_entries(entries) -> None:
     global total_count
     for entry in entries:
         if entry.isDirectory == True:
@@ -48,7 +48,7 @@ def get_entries(entries):
             read_file(entry)
 
 
-def isEntry(object):
+def isEntry(object) -> bool:
     try:
         object.isFile
         return True
@@ -56,11 +56,11 @@ def isEntry(object):
         return False
 
 
-def read_file(entry):
+def read_file(entry) -> None:
     entry.file(create_proxy(read_text))
 
 
-def read_text(file):
+def read_text(file) -> None:
     reader = FileReader.new()
 
     def onload(e):
@@ -80,7 +80,7 @@ def read_text(file):
     reader.readAsArrayBuffer(file)
 
 
-def dragover_handler(event):
+def dragover_handler(event) -> None:
     event.preventDefault()
 
 
