@@ -1,3 +1,19 @@
+"""
+
+   ___    _             __           
+  / _ \  (_) ___    ___/ / ___   ____
+ / ___/ / / / _ \  / _  / / -_) / __/
+/_/    /_/ /_//_/  \_,_/  \__/ /_/   
+                                     
+
+MIT License, Copyright (c) 2024 TheSalt_
+
+한국공학대학교 소프트웨어공학과 파이썬프로그래밍
+
+타입명 앞에 `JS.`이 있으면 자바스크립트 객체이므로 pyscript로 프록시 필요
+"""
+
+
 from pyscript import document  # type: ignore
 from pyodide.ffi import create_proxy  # type: ignore
 from js import FileReader  # type: ignore
@@ -17,7 +33,7 @@ def drop_handler(event) -> None:
     """파일 드롭 수신
 
     Args:
-        event (event): 이벤트
+        event (JS.event): 이벤트
     """
     global total_count
     event.preventDefault()  # 파일이 열리지 않게 기존 이벤트 취소
@@ -54,7 +70,7 @@ def get_directory_entries(entry) -> None:
     """DirectoryEntryList 객체를 list[DirectoryEntry]로 프록시
 
     Args:
-        entry (DirectoryEntryList): 폴더 리스트 객체
+        entry (JS.DirectoryEntryList): 폴더 리스트 객체
     """
     entry.createReader().readEntries(create_proxy(get_entries))
 
@@ -63,7 +79,7 @@ def get_entries(entries) -> None:
     """DirectoryEntry 객체를 검사해 내부 파일 분류
 
     Args:
-        entries (DirectoryEntry): 폴더 객체
+        entries (JS.DirectoryEntry): 폴더 객체
     """
     global total_count
     for entry in entries:
@@ -83,7 +99,7 @@ def isEntry(object) -> bool:
     """객체가 Entry인지 아닌지 검사
 
     Args:
-        object (DirectoryEntry | FileEntry | any): 검사할 객체
+        object (JS.DirectoryEntry | JS.FileEntry | any): 검사할 객체
 
     Returns:
         bool: 검사여부
@@ -99,7 +115,7 @@ def read_file(entry) -> None:
     """파일 읽기 프록시
 
     Args:
-        entry (FileEntry): 파일
+        entry (JS.FileEntry): 파일
     """
     entry.file(create_proxy(read_text))
 
@@ -108,7 +124,7 @@ def read_text(file) -> None:
     """파일 읽기
 
     Args:
-        file (File): 읽을 파일
+        file (JS.File): 읽을 파일
     """
     reader = FileReader.new()
 
@@ -136,7 +152,7 @@ def dragover_handler(event) -> None:
     CSS 활용 또는 제거 예정
 
     Args:
-        event (event): 이벤트
+        event (JS.event): 이벤트
     """
     event.preventDefault()
 
