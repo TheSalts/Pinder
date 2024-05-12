@@ -1,0 +1,8 @@
+#drop_zone {
+  width: 50%;
+  height: 200px;
+  border: 2px dashed #ccc;
+  border-radius: 20px;
+  position: relative;
+  margin: 0 auto;
+}

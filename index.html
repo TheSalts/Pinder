@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Drag and Drop Folder Example</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://pyscript.net/releases/2023.11.2/core.css"
+    />
+    <script
+      type="module"
+      src="https://pyscript.net/releases/2023.11.2/core.js"
+    ></script>
+    <py-config type="json"> { "packages": ["pypdf","PyOCR"] } </py-config>
+  </head>
+  <body>
+    <script type="py" src="main.py"></script>
+    <div id="drop_zone">
+      <p>Drag one or more files to this Drop Zone ...</p>
+    </div>
+    <!-- <script>
+      let drop_zone = document.getElementById("drop_zone");
+      drop_zone.addEventListener("drop", function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        const files = e.dataTransfer.files; // 드랍한 파일들의 목록을 가져옵니다.
+        let dir = e.dataTransfer.items[0].webkitGetAsEntry();
+        dir.createReader().readEntries((result) => console.log(result));
+        if (files.length) {
+          const file = files[0];
+          const reader = new FileReader();
+          // 파일 읽기가 성공했을 때 실행될 이벤트 핸들러를 정의합니다.
+          reader.onload = function (e) {
+            console.log(e.target.result); // 파일의 내용을 콘솔에 출력합니다.
+          };
+
+          // 파일을 읽기 시작합니다. 텍스트 형태로 읽습니다.
+          reader.readAsText(file);
+        }
+      });
+    </script> -->
+  </body>
+</html>
