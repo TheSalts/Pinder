@@ -17,16 +17,19 @@ MIT License, Copyright (c) 2024 TheSalt_
 from pyscript import document  # type: ignore
 from pyodide.ffi import create_proxy  # type: ignore
 from js import FileReader  # type: ignore
+import js  # type: ignore
 from io import BytesIO
 import pypdf
 import os
+
 
 """
 프록시로 인해 비동기 사용이 어려운 관계로 마지막 파일을 읽고 나서 search_data 불러오기
 """
 total_count: int = 0  # 총 파일 개수
 read_count: int = 0  # 읽은 파일 개수
-search_data: list[str | object] = []  # 검색어를 검색할 데이터
+search_data: list[list[dict[str, int | str]]] = []  # 검색어를 검색할 데이터
+search_keyword: str = "파이썬"  # 임시
 
 
 def drop_handler(event) -> None:
@@ -45,12 +48,12 @@ def drop_handler(event) -> None:
         폴더인지 아닌지 검사 후 폴더면 하위 디렉토리 재검색
         """
         if entry.isDirectory == True:
-            get_directory_entries(entry)
+            entry.createReader().readEntries(create_proxy(get_entries))
         else:
             if is_pdf(entry.name) == False:  # PDF가 아니면 패스
                 continue
             total_count += 1
-            read_file(entry)
+            entry.file(create_proxy(read_text))
 
 
 def is_pdf(filename: str) -> bool:
@@ -66,15 +69,6 @@ def is_pdf(filename: str) -> bool:
     return ext.lower() == ".pdf"
 
 
-def get_directory_entries(entry) -> None:
-    """DirectoryEntryList 객체를 list[DirectoryEntry]로 프록시
-
-    Args:
-        entry (JS.DirectoryEntryList): 폴더 리스트 객체
-    """
-    entry.createReader().readEntries(create_proxy(get_entries))
-
-
 def get_entries(entries) -> None:
     """DirectoryEntry 객체를 검사해 내부 파일 분류
 
@@ -87,12 +81,12 @@ def get_entries(entries) -> None:
         폴더인지 아닌지 검사 후 폴더면 하위 디렉토리 재검색
         """
         if entry.isDirectory == True:
-            get_directory_entries(entry)
+            entry.createReader().readEntries(create_proxy(get_entries))
         else:
             if is_pdf(entry.name) == False:  # PDF가 아니면 패스
                 continue
             total_count += 1
-            read_file(entry)
+            entry.file(create_proxy(read_text))
 
 
 def isEntry(object) -> bool:
@@ -111,15 +105,6 @@ def isEntry(object) -> bool:
         return False
 
 
-def read_file(entry) -> None:
-    """파일 읽기 프록시
-
-    Args:
-        entry (JS.FileEntry): 파일
-    """
-    entry.file(create_proxy(read_text))
-
-
 def read_text(file) -> None:
     """파일 읽기
 
@@ -129,21 +114,67 @@ def read_text(file) -> None:
     reader = FileReader.new()
 
     def onload(e):
-        global read_count, total_count, search_data
+        """파일 읽어서 검색으로 보내기
+
+        Args:
+            e (JS.event): 이벤트
+        """
+        global read_count, total_count, search_data, search_keyword
         pdf_bytes = BytesIO(e.target.result.to_py())  # ArrayBuffer를 Bytes로 변환
         reader = pypdf.PdfReader(pdf_bytes)
-        results: list[str] = []  # 결과 저장 위치
+        results: list[dict[str, int | str]] = []  # 결과 저장 위치
         for page in reader.pages:
             text: str = page.extract_text()
-            if "파이썬".lower() in text.lower():
-                results.append(
-                    f"페이지 {reader.pages.index(page)+1}: {text}")  # 결과 저장
+            obj: dict[str, int | str] = {
+                "page": reader.pages.index(page)+1, "text": text
+            }
+            results.append(obj)  # 결과 저장
         search_data.append(results)  # 최종 결과에 저장
         read_count += 1
         if total_count == read_count:
-            print(search_data)
+            search(e.target.result)
+
     reader.addEventListener('load', create_proxy(onload))  # 파일 읽기에 성공하면 이벤트 호출
     reader.readAsArrayBuffer(file)  # JS의 ArrayBuffer로 읽기
+
+
+def search(pdfArrayBuffer) -> None:
+    """데이터 검색
+
+    Args:
+        pdfArrayBuffer (JS.ArrayBuffer): PDF 버퍼
+
+    data = {
+        "page": ${페이지 번호} (int), "text": ${텍스트} (str)
+    }
+    """
+    global search_data, search_keyword, total_count, read_count
+    total_count = 0
+    for i in search_data:
+        total_count += len(i)
+    read_count = 0
+    found_data: list[dict[str, str | int]] = []
+    found_data_pages: list[int] = []
+    for data_list in search_data:
+        for data in data_list:
+            read_count += 1
+            searching_data: str = data["text"].lower()   # type: ignore
+            found: int = searching_data.find(search_keyword)
+            if found != -1:
+                found_data.append(data)
+                found_data_pages.append(data["page"])  # type: ignore
+            if total_count == read_count:
+                found_data_pages = list(set(found_data_pages))
+                if found_data == []:
+                    return search_fail()
+                for page in found_data_pages:
+                    js.set_pdf(pdfArrayBuffer, page)
+
+
+def search_fail() -> None:
+    """검색 실패 예외처리
+    """
+    print("검색 실패")
 
 
 def dragover_handler(event) -> None:
