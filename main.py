@@ -24,10 +24,8 @@ import os
 
 
 """
-프록시로 인해 비동기 사용이 어려운 관계로 마지막 파일을 읽고 나서 search_data 불러오기
+글로벌 변수
 """
-total_count: int = 0  # 총 파일 개수
-read_count: int = 0  # 읽은 파일 개수
 search_data: list[list[dict[str, int | str]]] = []  # 검색어를 검색할 데이터
 search_keyword: str = "파이썬"  # 임시
 
@@ -38,7 +36,6 @@ def drop_handler(event) -> None:
     Args:
         event (JS.event): 이벤트
     """
-    global total_count
     event.preventDefault()  # 파일이 열리지 않게 기존 이벤트 취소
     event.stopPropagation()
     items = event.dataTransfer.items
@@ -52,7 +49,6 @@ def drop_handler(event) -> None:
         else:
             if is_pdf(entry.name) == False:  # PDF가 아니면 패스
                 continue
-            total_count += 1
             entry.file(create_proxy(read_text))
 
 
@@ -75,7 +71,6 @@ def get_entries(entries) -> None:
     Args:
         entries (JS.DirectoryEntry): 폴더 객체
     """
-    global total_count
     for entry in entries:
         """
         폴더인지 아닌지 검사 후 폴더면 하위 디렉토리 재검색
@@ -85,7 +80,6 @@ def get_entries(entries) -> None:
         else:
             if is_pdf(entry.name) == False:  # PDF가 아니면 패스
                 continue
-            total_count += 1
             entry.file(create_proxy(read_text))
 
 
@@ -126,49 +120,57 @@ def read_text(file) -> None:
         for page in reader.pages:
             text: str = page.extract_text()
             obj: dict[str, int | str] = {
-                "page": reader.pages.index(page)+1, "text": text
+                "page": reader.pages.index(page)+1, "text": text, "filename": file.name
             }
             results.append(obj)  # 결과 저장
         search_data.append(results)  # 최종 결과에 저장
-        read_count += 1
-        if total_count == read_count:
-            search(e.target.result)
+        search(e.target.result, file.name)
 
     reader.addEventListener('load', create_proxy(onload))  # 파일 읽기에 성공하면 이벤트 호출
     reader.readAsArrayBuffer(file)  # JS의 ArrayBuffer로 읽기
 
 
-def search(pdfArrayBuffer) -> None:
+def search(pdfArrayBuffer, filename) -> None:
     """데이터 검색
 
     Args:
         pdfArrayBuffer (JS.ArrayBuffer): PDF 버퍼
 
     data = {
-        "page": ${페이지 번호} (int), "text": ${텍스트} (str)
+        "page": ${페이지 번호} (int), "text": ${텍스트} (str), "filename": ${파일 이름} (str)
     }
     """
-    global search_data, search_keyword, total_count, read_count
-    total_count = 0
+    global search_data, search_keyword
+    total_count: int = 0
     for i in search_data:
         total_count += len(i)
-    read_count = 0
+    read_count: int = 0
     found_data: list[dict[str, str | int]] = []
-    found_data_pages: list[int] = []
     for data_list in search_data:
         for data in data_list:
             read_count += 1
             searching_data: str = data["text"].lower()   # type: ignore
-            found: int = searching_data.find(search_keyword)
-            if found != -1:
+            found: int = searching_data.find(search_keyword)  # 검색
+            if found != -1:  # 검색에 성공
                 found_data.append(data)
-                found_data_pages.append(data["page"])  # type: ignore
             if total_count == read_count:
-                found_data_pages = list(set(found_data_pages))
                 if found_data == []:
                     return search_fail()
-                for page in found_data_pages:
-                    js.set_pdf(pdfArrayBuffer, page)
+                found_data_file_pages: list[dict[str, str | int]] = found_data
+                seen = set()
+                new_data = []
+                for item in found_data_file_pages:
+                    # 딕셔너리 아이템을 (키, 값) 튜플의 리스트로 변환 후, 다시 튜플로 변환
+                    # 딕셔너리가 순서를 보장하지 않으므로, 키를 기준으로 정렬
+                    item_tuple = tuple(sorted(item.items()))
+                    if item_tuple not in seen:
+                        seen.add(item_tuple)
+                        new_data.append(item)
+                found_data_file_pages = new_data
+                for page in found_data_file_pages:
+                    if page["filename"] == filename:
+                        js.set_pdf(pdfArrayBuffer, page["page"])  # pdf 렌더링
+                        drop_zone.remove()  # 파일 선택 제거
 
 
 def search_fail() -> None:

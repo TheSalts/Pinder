@@ -29,7 +29,7 @@
           .getDocument(uint8Array)
           .promise.then((pdf) => {
             pdf.getPage(page).then(renderPage);
-            console.log("PDF 로드 성공", pdf, page);
+            console.log("PDF 로드 성공");
           })
           .catch(function (error) {
             console.error("PDF 로드 실패", error);
