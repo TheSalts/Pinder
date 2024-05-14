@@ -156,7 +156,7 @@ def search(pdfArrayBuffer, filename) -> None:
             if total_count == read_count:
                 if found_data == []:
                     return search_fail()
-                found_data_file_pages: list[dict[str, str | int]] = found_data
+                found_data_file_pages = found_data
                 seen = set()
                 new_data = []
                 for item in found_data_file_pages:
