@@ -160,7 +160,7 @@ def search(pdfArrayBuffer, filename) -> None:
                 seen = set()
                 new_data = []
                 for item in found_data_file_pages:
-                    # 딕셔너리 아이템을 (키, 값) 튜플의 리스트로 변환 후, 다시 튜플로 변환
+                    # 딕셔너리 아이템을 튜플의 리스트로 변환 후, 다시 튜플로 변환
                     # 딕셔너리가 순서를 보장하지 않으므로, 키를 기준으로 정렬
                     item_tuple = tuple(sorted(item.items()))
                     if item_tuple not in seen:

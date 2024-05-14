@@ -36,14 +36,14 @@
           });
       }
       function renderPage(page) {
-        var canvas = document.createElement("canvas");
+        let canvas = document.createElement("canvas");
         canvas.id = `pdf-canvas-${page.pageIndex}`;
-        var ctx = canvas.getContext("2d");
-        var viewport = page.getViewport({ scale: 1.5 });
+        let ctx = canvas.getContext("2d");
+        let viewport = page.getViewport({ scale: 1.5 });
         canvas.height = viewport.height;
         canvas.width = viewport.width;
         document.getElementById("pdf-container").appendChild(canvas);
-        var renderContext = {
+        let renderContext = {
           canvasContext: ctx,
           viewport: viewport,
         };
