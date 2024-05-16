@@ -15,6 +15,7 @@
     <py-config type="json"> { "packages": ["pypdf"] } </py-config>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.1.266/build/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.1.266/build/pdf.worker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   </head>
   <body>
     <script type="py" src="main.py"></script>
@@ -23,7 +24,7 @@
     </div>
     <div id="pdf-container" width="500" height="300"></div>
     <script>
-      function set_pdf(arrayBuffer, page) {
+      function setPDF(arrayBuffer, page) {
         let uint8Array = new Uint8Array(arrayBuffer);
         pdfjsLib
           .getDocument(uint8Array)
@@ -33,6 +34,39 @@
           })
           .catch(function (error) {
             console.error("PDF 로드 실패", error);
+          });
+      }
+      async function getPDFImage(arrayBuffer) {
+        var images = [];
+
+        pdfjsLib
+          .getDocument(arrayBuffer)
+          .promise.then(function (pdf) {
+            var pages = [];
+            for (var i = 1; i <= pdf.numPages; i++) {
+              pages.push(i);
+            }
+
+            return Promise.all(
+              pages.map(function (pageNum) {
+                return pdf.getPage(pageNum).then(function (page) {
+                  return page.getOperatorList().then(function (ops) {
+                    for (var i = 0; i < ops.fnArray.length; i++) {
+                      if (ops.fnArray[i] === pdfjsLib.OPS.paintImageXObject) {
+                        var img = ops.argsArray[i][0];
+                        images.push(img);
+                      }
+                    }
+                  });
+                });
+              })
+            );
+          })
+          .then(function () {
+            readImgListText(images);
+          })
+          .catch(function (error) {
+            console.error("Error: " + error);
           });
       }
       function renderPage(page) {
@@ -48,6 +82,26 @@
           viewport: viewport,
         };
         page.render(renderContext);
+      }
+      async function readImgListText(imgArray) {
+        let ret;
+        for (let img of imgArray) {
+          await Tesseract.recognize(img, "eng+kor", {
+            logger: (m) => {
+              console.log(m);
+            },
+          })
+            .then(({ data: { text } }) => {
+              text = text
+                .split("\n")
+                .map((line) => line.trim().replace(/\s/g, ""))
+                .filter((line) => line !== "");
+              console.log(text);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        }
       }
     </script>
   </body>
