@@ -27,7 +27,7 @@ import os
 글로벌 변수
 """
 search_data: list[list[dict[str, int | str]]] = []  # 검색어를 검색할 데이터
-search_keyword: str = "파이썬"  # 임시
+search_keyword: str = "한국"  # 임시
 
 
 def drop_handler(event) -> None:

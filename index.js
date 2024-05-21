@@ -21,7 +21,7 @@ function setPDF(arrayBuffer, page) {
  */
 function renderPage(page) {
   let canvas = document.createElement("canvas");
-  canvas.id = `pdf-canvas-${page.pageIndex}`;
+  canvas.id = `pdf-canvas`;
   let ctx = canvas.getContext("2d");
   let viewport = page.getViewport({ scale: 1.5 });
   canvas.height = viewport.height;
@@ -76,7 +76,7 @@ async function getPDFImage(arrayBuffer) {
  * @param {[{url:string, page:pdfjsLib.PDFPageProxy}]} imgArray page.url은 Base64
  */
 async function readImgListText(imgArray) {
-  search_keyword = "파이썬"; // 임시
+  search_keyword = "한국"; // 임시
   for (let img of imgArray) {
     await Tesseract.recognize(img.url, "eng+kor")
       .then(({ data: { text } }) => {
