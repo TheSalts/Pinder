@@ -12,6 +12,20 @@ function setPDF(arrayBuffer, page) {
       console.error("PDF 로드 실패", error);
     });
 }
+function renderPage(page) {
+  let canvas = document.createElement("canvas");
+  canvas.id = `pdf-canvas-${page.pageIndex}`;
+  let ctx = canvas.getContext("2d");
+  let viewport = page.getViewport({ scale: 1.5 });
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;
+  document.getElementById("pdf-container").appendChild(canvas);
+  let renderContext = {
+    canvasContext: ctx,
+    viewport: viewport,
+  };
+  page.render(renderContext);
+}
 async function getPDFImage(arrayBuffer) {
   let images = [];
   pdfjsLib
@@ -45,20 +59,6 @@ async function getPDFImage(arrayBuffer) {
     .catch(function (error) {
       console.error("Error: " + error);
     });
-}
-function renderPage(page) {
-  let canvas = document.createElement("canvas");
-  canvas.id = `pdf-canvas-${page.pageIndex}`;
-  let ctx = canvas.getContext("2d");
-  let viewport = page.getViewport({ scale: 1.5 });
-  canvas.height = viewport.height;
-  canvas.width = viewport.width;
-  document.getElementById("pdf-container").appendChild(canvas);
-  let renderContext = {
-    canvasContext: ctx,
-    viewport: viewport,
-  };
-  page.render(renderContext);
 }
 async function readImgListText(imgArray) {
   for (let img of imgArray) {
