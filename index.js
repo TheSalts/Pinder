@@ -1,5 +1,8 @@
-search_keyword = "정보"; // 임시
-
+/**
+ * PDF를 불러옵니다.
+ * @param {ArrayBuffer} arrayBuffer
+ * @param {number} page
+ */
 function setPDF(arrayBuffer, page) {
   let uint8Array = new Uint8Array(arrayBuffer);
   pdfjsLib
@@ -12,6 +15,10 @@ function setPDF(arrayBuffer, page) {
       console.error("PDF 로드 실패", error);
     });
 }
+/**
+ * PDF 페이지를 렌더링합니다.
+ * @param {pdfjslib.PDFPageProxy} page
+ */
 function renderPage(page) {
   let canvas = document.createElement("canvas");
   canvas.id = `pdf-canvas-${page.pageIndex}`;
@@ -26,6 +33,10 @@ function renderPage(page) {
   };
   page.render(renderContext);
 }
+/**
+ * PDF 이미지를 불러옵니다.
+ * @param {ArrayBuffer} arrayBuffer
+ */
 async function getPDFImage(arrayBuffer) {
   let images = [];
   pdfjsLib
@@ -60,7 +71,12 @@ async function getPDFImage(arrayBuffer) {
       console.error("Error: " + error);
     });
 }
+/**
+ * 이미지에 있는 텍스트를 읽고 검색에 성공하면 렌더링
+ * @param {[{url:string, page:pdfjsLib.PDFPageProxy}]} imgArray page.url은 Base64
+ */
 async function readImgListText(imgArray) {
+  search_keyword = "파이썬"; // 임시
   for (let img of imgArray) {
     await Tesseract.recognize(img.url, "eng+kor")
       .then(({ data: { text } }) => {
