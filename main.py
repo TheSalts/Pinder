@@ -27,7 +27,7 @@ import os
 글로벌 변수
 """
 search_data: list[list[dict[str, int | str]]] = []  # 검색어를 검색할 데이터
-search_keyword: str = "파이썬"  # 임시
+search_keyword: str = "한국"  # 임시
 
 
 def drop_handler(event) -> None:
@@ -123,6 +123,7 @@ def read_text(file) -> None:
                 "page": reader.pages.index(page)+1, "text": text, "filename": file.name
             }
             results.append(obj)  # 결과 저장
+        js.getPDFImage(e.target.result)
         search_data.append(results)  # 최종 결과에 저장
         search(e.target.result, file.name)
 
@@ -169,7 +170,7 @@ def search(pdfArrayBuffer, filename) -> None:
                 found_data_file_pages = new_data
                 for page in found_data_file_pages:
                     if page["filename"] == filename:
-                        js.set_pdf(pdfArrayBuffer, page["page"])  # pdf 렌더링
+                        js.setPDF(pdfArrayBuffer, page["page"])  # pdf 렌더링
                         drop_zone.remove()  # 파일 선택 제거
 
 

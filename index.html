@@ -15,6 +15,7 @@
     <py-config type="json"> { "packages": ["pypdf"] } </py-config>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.1.266/build/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.1.266/build/pdf.worker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   </head>
   <body>
     <script type="py" src="main.py"></script>
@@ -25,33 +26,6 @@
       <input class="file" type="file">
     </div>
     <div id="pdf-container" width="500" height="300"></div>
-    <script>
-      function set_pdf(arrayBuffer, page) {
-        let uint8Array = new Uint8Array(arrayBuffer);
-        pdfjsLib
-          .getDocument(uint8Array)
-          .promise.then((pdf) => {
-            pdf.getPage(page).then(renderPage);
-            console.log("PDF 로드 성공");
-          })
-          .catch(function (error) {
-            console.error("PDF 로드 실패", error);
-          });
-      }
-      function renderPage(page) {
-        let canvas = document.createElement("canvas");
-        canvas.id = `pdf-canvas-${page.pageIndex}`;
-        let ctx = canvas.getContext("2d");
-        let viewport = page.getViewport({ scale: 1.5 });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        document.getElementById("pdf-container").appendChild(canvas);
-        let renderContext = {
-          canvasContext: ctx,
-          viewport: viewport,
-        };
-        page.render(renderContext);
-      }
-    </script>
+    <script src="index.js"></script>
   </body>
 </html>
