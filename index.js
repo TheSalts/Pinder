@@ -76,7 +76,7 @@ async function getPDFImage(arrayBuffer) {
  * @param {[{url:string, page:pdfjsLib.PDFPageProxy}]} imgArray page.url은 Base64
  */
 async function readImgListText(imgArray) {
-  search_keyword = "한국"; // 임시
+  search_keyword = "데이터"; // 임시
   for (let img of imgArray) {
     await Tesseract.recognize(img.url, "eng+kor")
       .then(({ data: { text } }) => {
