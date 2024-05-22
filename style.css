@@ -7,14 +7,13 @@
   margin: 0 auto;
   align-items: center;
   display: flex;
-  justify-content: center ;
+  justify-content: center;
 }
 
 #file {
   width: 200px;
   height: 200px;
   height: 100%;
- 
 }
 
 /* Add a black background color to the top navigation bar */
@@ -32,7 +31,6 @@
   padding: 14px 16px;
   text-decoration: none;
   font-size: 17px;
-  
 }
 
 /* Change the color of links on hover */
@@ -43,12 +41,12 @@
 
 /* Style the "active" element to highlight the current page */
 .topnav a.active {
-  background-color: #2196F3;
+  background-color: #2196f3;
   color: white;
 }
 
 /* Style the search box inside the navigation bar */
-.topnav input[type=text] {
+.topnav input[type="text"] {
   float: right;
   padding: 6px;
   border: none;
@@ -59,7 +57,8 @@
 
 /* When the screen is less than 600px wide, stack the links and the search field vertically instead of horizontally */
 @media screen and (max-width: 600px) {
-  .topnav a, .topnav input[type=text] {
+  .topnav a,
+  .topnav input[type="text"] {
     float: none;
     display: block;
     text-align: left;
@@ -67,7 +66,68 @@
     margin: 0;
     padding: 14px;
   }
-  .topnav input[type=text] {
+  .topnav input[type="text"] {
     border: 1px solid #ccc;
   }
+}
+
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f8f9fa;
+}
+.search-container {
+  text-align: center;
+}
+.search-input {
+  width: 400px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+.search-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #4285f4;
+  color: white;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.search-button:hover {
+  background-color: #357ae8;
+}
+.file-input {
+  margin: 10px 0;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.logo {
+  font-size: 48px;
+  font-weight: bold;
+  color: #4285f4;
+  margin-bottom: 20px;
+}
+.file-drop {
+  width: 420px;
+  padding: 20px;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+  background-color: #fafafa;
+  color: #999;
+  text-align: center;
+  margin-top: 10px;
+}
+.file-drop.dragover {
+  border-color: #4285f4;
+  background-color: #f1f1f1;
 }

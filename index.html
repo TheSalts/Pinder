@@ -16,103 +16,27 @@
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.1.266/build/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.1.266/build/pdf.worker.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <style>
-      body {
-          font-family: Arial, sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          margin: 0;
-          background-color: #f8f9fa;
-      }
-      .search-container {
-          text-align: center;
-      }
-      .search-input {
-          width: 400px;
-          padding: 10px;
-          font-size: 16px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          margin-bottom: 10px;
-      }
-      .search-button {
-          padding: 10px 20px;
-          font-size: 16px;
-          border: none;
-          border-radius: 4px;
-          background-color: #4285f4;
-          color: white;
-          cursor: pointer;
-          margin-left: 10px;
-      }
-      .search-button:hover {
-          background-color: #357ae8;
-      }
-      .file-input {
-          margin: 10px 0;
-          padding: 10px;
-          font-size: 16px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-      }
-      .logo {
-          font-size: 48px;
-          font-weight: bold;
-          color: #4285f4;
-          margin-bottom: 20px;
-      }
-      .file-drop {
-          width: 420px;
-          padding: 20px;
-          border: 2px dashed #ddd;
-          border-radius: 4px;
-          background-color: #fafafa;
-          color: #999;
-          text-align: center;
-          margin-top: 10px;
-      }
-      .file-drop.dragover {
-          border-color: #4285f4;
-          background-color: #f1f1f1;
-      }
-  </style>
+    <script type="py" src="main.py"></script>
+    <script src="index.js"></script>
   </head>
   <body>
     <div class="search-container">
-        <div class="logo">PINDER</div>
-        <form>
-            <input type="text" name="q" class="search-input" placeholder="Search PINDER..."><br>
-            <input type="file" class="file-input"><br>
-            <div class="file-drop" id="file-drop">Drag & Drop your files here</div><br>
-            <button type="submit" class="search-button">PINDER Search</button>
-        </form>
+      <div class="logo">PINDER</div>
+      <form>
+        <input
+          type="text"
+          name="q"
+          class="search-input"
+          placeholder="Search PINDER..."
+          id="search-input"
+        /><br />
+        <input type="file" class="file-input" /><br />
+        <div class="file-drop" id="file-drop">
+          파일 또는 폴더를 이곳에 끌어다 놓으세요
+        </div>
+        <br />
+        <button type="submit" class="search-button">PINDER Search</button>
+      </form>
     </div>
-
-    <script>
-        const fileDrop = document.getElementById('file-drop');
-
-        fileDrop.addEventListener('dragover', (event) => {
-            event.preventDefault();
-            fileDrop.classList.add('dragover');
-        });
-
-        fileDrop.addEventListener('dragleave', () => {
-            fileDrop.classList.remove('dragover');
-        });
-
-        fileDrop.addEventListener('drop', (event) => {
-            event.preventDefault();
-            fileDrop.classList.remove('dragover');
-
-            const files = event.dataTransfer.files;
-            if (files.length > 0) {
-                // Handle the files here
-                console.log(files);
-                alert(`Dropped ${files.length} file(s).`);
-            }
-        });
-    </script>
-</body>
+  </body>
 </html>

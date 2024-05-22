@@ -27,17 +27,27 @@ import os
 글로벌 변수
 """
 search_data: list[list[dict[str, int | str]]] = []  # 검색어를 검색할 데이터
-search_keyword: str = "한국"  # 임시
+search_keyword: str = document.getElementById("search-input").value
 
 
+def drag_handler(func):
+    """드래그 이벤트 데코레이션"""
+    def wrapper(event):
+        event.preventDefault()
+        event.stopPropagation()
+        func()
+    return wrapper
+
+
+@drag_handler
 def drop_handler(event) -> None:
     """파일 드롭 수신
 
     Args:
         event (JS.event): 이벤트
     """
-    event.preventDefault()  # 파일이 열리지 않게 기존 이벤트 취소
-    event.stopPropagation()
+    file_drop.classList.remove("dragover")
+
     items = event.dataTransfer.items
     for item in items:
         entry = item.webkitGetAsEntry()
@@ -171,7 +181,7 @@ def search(pdfArrayBuffer, filename) -> None:
                 for page in found_data_file_pages:
                     if page["filename"] == filename:
                         js.setPDF(pdfArrayBuffer, page["page"])  # pdf 렌더링
-                        drop_zone.remove()  # 파일 선택 제거
+                        file_drop.remove()  # 파일 선택 제거
 
 
 def search_fail() -> None:
@@ -180,20 +190,22 @@ def search_fail() -> None:
     print("검색 실패")
 
 
-def dragover_handler(event) -> None:
-    """Dragover 이벤트 수신
+@drag_handler
+def dragover_handler() -> None:
+    """dragover 이벤트 수신"""
+    file_drop.classList.add("dragover")
 
-    CSS 활용 또는 제거 예정
 
-    Args:
-        event (JS.event): 이벤트
-    """
-    event.preventDefault()
+@drag_handler
+def dragleave_handler() -> None:
+    """dragleave 이벤트 수신"""
+    file_drop.classList.remove("dragover")
 
 
 """
 JS 이벤트 핸들러
 """
-drop_zone = document.getElementById("drop_zone")
-drop_zone.addEventListener('drop', create_proxy(drop_handler))
-drop_zone.addEventListener('dragover', create_proxy(dragover_handler))
+file_drop = document.getElementById("file-drop")
+file_drop.addEventListener('drop', create_proxy(drop_handler))
+file_drop.addEventListener('dragover', create_proxy(dragover_handler))
+file_drop.addEventListener('dragleave', create_proxy(dragleave_handler))
