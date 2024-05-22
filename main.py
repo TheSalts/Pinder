@@ -27,25 +27,17 @@ import os
 글로벌 변수
 """
 search_data: list[list[dict[str, int | str]]] = []  # 검색어를 검색할 데이터
-search_keyword: str = document.getElementById("search-input").value
+search_keyword: str = ""
 
 
-def drag_handler(func):
-    """드래그 이벤트 데코레이션"""
-    def wrapper(event):
-        event.preventDefault()
-        event.stopPropagation()
-        func()
-    return wrapper
-
-
-@drag_handler
 def drop_handler(event) -> None:
-    """파일 드롭 수신
+    """파일 & 폴더 드롭 수신
 
     Args:
         event (JS.event): 이벤트
     """
+    event.preventDefault()
+    event.stopPropagation()
     file_drop.classList.remove("dragover")
 
     items = event.dataTransfer.items
@@ -60,6 +52,18 @@ def drop_handler(event) -> None:
             if is_pdf(entry.name) == False:  # PDF가 아니면 패스
                 continue
             entry.file(create_proxy(read_text))
+
+
+def file_handler(event) -> None:
+    """파일 버튼 수신
+
+    Args:
+        event (JS.event): 이벤트
+    """
+    event.preventDefault()
+    event.stopPropagation()
+    for item in event.target.files:
+        read_text(item)
 
 
 def is_pdf(filename: str) -> bool:
@@ -124,6 +128,7 @@ def read_text(file) -> None:
             e (JS.event): 이벤트
         """
         global read_count, total_count, search_data, search_keyword
+        search_keyword = document.getElementById("search-input").value
         pdf_bytes = BytesIO(e.target.result.to_py())  # ArrayBuffer를 Bytes로 변환
         reader = pypdf.PdfReader(pdf_bytes)
         results: list[dict[str, int | str]] = []  # 결과 저장 위치
@@ -190,15 +195,15 @@ def search_fail() -> None:
     print("검색 실패")
 
 
-@drag_handler
-def dragover_handler() -> None:
+def dragover_handler(event) -> None:
     """dragover 이벤트 수신"""
+    event.preventDefault()
     file_drop.classList.add("dragover")
 
 
-@drag_handler
-def dragleave_handler() -> None:
+def dragleave_handler(event) -> None:
     """dragleave 이벤트 수신"""
+    event.preventDefault()
     file_drop.classList.remove("dragover")
 
 
@@ -209,3 +214,6 @@ file_drop = document.getElementById("file-drop")
 file_drop.addEventListener('drop', create_proxy(drop_handler))
 file_drop.addEventListener('dragover', create_proxy(dragover_handler))
 file_drop.addEventListener('dragleave', create_proxy(dragleave_handler))
+
+file_input = document.getElementById("file-input")
+file_input.addEventListener('change', create_proxy(file_handler))

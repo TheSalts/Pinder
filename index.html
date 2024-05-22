@@ -30,13 +30,20 @@
           placeholder="Search PINDER..."
           id="search-input"
         /><br />
-        <input type="file" class="file-input" /><br />
+        <input
+          type="file"
+          class="file-input"
+          id="file-input"
+          multiple
+          accept=".pdf"
+        /><br />
         <div class="file-drop" id="file-drop">
           파일 또는 폴더를 이곳에 끌어다 놓으세요
         </div>
         <br />
         <button type="submit" class="search-button">PINDER Search</button>
       </form>
+      <div id="pdf-container" width="500" height="300"></div>
     </div>
   </body>
 </html>
