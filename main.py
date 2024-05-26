@@ -196,11 +196,12 @@ def search_data_in_pdf(pdfArrayBuffer, filename) -> None:
                     if page["filename"] == filename:
                         js.setPDF(pdfArrayBuffer, page["page"])  # pdf 렌더링
                         file_drop.remove()  # 파일 선택 제거
+                        file_input.remove()
 
 
 def search_fail() -> None:
     """검색 실패 예외처리"""
-    print("검색 실패")
+    print("검색 실패  - 이미지 검색 시작")
 
 
 def dragover_handler(event) -> None:
@@ -216,6 +217,7 @@ def dragleave_handler(event) -> None:
 
 
 def search_button_handler(e) -> None:
+    """검색 버튼 수신"""
     global pdf_data
     if pdf_data == []:
         return

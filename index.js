@@ -20,7 +20,6 @@ function setPDF(arrayBuffer, page) {
  * @param {pdfjslib.PDFPageProxy} page
  */
 function renderPage(page) {
-  console.log(page);
   let canvas = document.createElement("canvas");
   canvas.id = `pdf-canvas`;
   let ctx = canvas.getContext("2d");
