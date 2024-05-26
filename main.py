@@ -1,10 +1,10 @@
 """
 
-   ___    _             __           
+   ___    _             __
   / _ \  (_) ___    ___/ / ___   ____
  / ___/ / / / _ \  / _  / / -_) / __/
-/_/    /_/ /_//_/  \_,_/  \__/ /_/   
-                                     
+/_/    /_/ /_//_/  \_,_/  \__/ /_/
+
 
 MIT License, Copyright (c) 2024 TheSalt_
 
@@ -27,7 +27,7 @@ import os
 글로벌 변수
 """
 search_data: list[list[dict[str, int | str]]] = []  # 검색어를 검색할 데이터
-search_keyword: str = ""
+pdf_data: list[dict] = []
 
 
 def drop_handler(event) -> None:
@@ -40,12 +40,16 @@ def drop_handler(event) -> None:
     event.stopPropagation()
     file_drop.classList.remove("dragover")
 
+    if document.getElementById("search-input").value == "":
+        return js.alert("검색어를 입력하세요")
+
     items = event.dataTransfer.items
+
     for item in items:
-        entry = item.webkitGetAsEntry()
+        entry = item.webkitGetAsEntry()  # type: ignore
         """
-        폴더인지 아닌지 검사 후 폴더면 하위 디렉토리 재검색
-        """
+            폴더인지 아닌지 검사 후 폴더면 하위 디렉토리 재검색
+            """
         if entry.isDirectory == True:
             entry.createReader().readEntries(create_proxy(get_entries))
         else:
@@ -62,6 +66,10 @@ def file_handler(event) -> None:
     """
     event.preventDefault()
     event.stopPropagation()
+
+    if document.getElementById("search-input").value == "":
+        return js.alert("검색어를 입력하세요")
+
     for item in event.target.files:
         read_text(item)
 
@@ -127,8 +135,7 @@ def read_text(file) -> None:
         Args:
             e (JS.event): 이벤트
         """
-        global read_count, total_count, search_data, search_keyword
-        search_keyword = document.getElementById("search-input").value
+        global read_count, total_count, search_data, pdf_data
         pdf_bytes = BytesIO(e.target.result.to_py())  # ArrayBuffer를 Bytes로 변환
         reader = pypdf.PdfReader(pdf_bytes)
         results: list[dict[str, int | str]] = []  # 결과 저장 위치
@@ -140,13 +147,14 @@ def read_text(file) -> None:
             results.append(obj)  # 결과 저장
         js.getPDFImage(e.target.result)
         search_data.append(results)  # 최종 결과에 저장
-        search(e.target.result, file.name)
+        search_data_in_pdf(e.target.result, file.name)
+        pdf_data.append({"buffer": e.target.result, "filename": file.name})
 
     reader.addEventListener('load', create_proxy(onload))  # 파일 읽기에 성공하면 이벤트 호출
     reader.readAsArrayBuffer(file)  # JS의 ArrayBuffer로 읽기
 
 
-def search(pdfArrayBuffer, filename) -> None:
+def search_data_in_pdf(pdfArrayBuffer, filename) -> None:
     """데이터 검색
 
     Args:
@@ -156,7 +164,8 @@ def search(pdfArrayBuffer, filename) -> None:
         "page": ${페이지 번호} (int), "text": ${텍스트} (str), "filename": ${파일 이름} (str)
     }
     """
-    global search_data, search_keyword
+    global search_data
+    search_keyword: str = document.getElementById("search-input").value
     total_count: int = 0
     for i in search_data:
         total_count += len(i)
@@ -190,8 +199,7 @@ def search(pdfArrayBuffer, filename) -> None:
 
 
 def search_fail() -> None:
-    """검색 실패 예외처리
-    """
+    """검색 실패 예외처리"""
     print("검색 실패")
 
 
@@ -207,6 +215,14 @@ def dragleave_handler(event) -> None:
     file_drop.classList.remove("dragover")
 
 
+def search_button_handler(e) -> None:
+    global pdf_data
+    if pdf_data == []:
+        return
+    for i in pdf_data:
+        search_data_in_pdf(i["buffer"], i["filename"])
+
+
 """
 JS 이벤트 핸들러
 """
@@ -217,3 +233,6 @@ file_drop.addEventListener('dragleave', create_proxy(dragleave_handler))
 
 file_input = document.getElementById("file-input")
 file_input.addEventListener('change', create_proxy(file_handler))
+
+search_button = document.getElementById("search-button")
+search_button.addEventListener('click', create_proxy(search_button_handler))
