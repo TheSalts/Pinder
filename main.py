@@ -40,9 +40,6 @@ def drop_handler(event) -> None:
     event.stopPropagation()
     file_drop.classList.remove("dragover")
 
-    if document.getElementById("search-input").value == "":
-        return js.alert("검색어를 입력하세요")
-
     items = event.dataTransfer.items
 
     for item in items:
@@ -66,9 +63,6 @@ def file_handler(event) -> None:
     """
     event.preventDefault()
     event.stopPropagation()
-
-    if document.getElementById("search-input").value == "":
-        return js.alert("검색어를 입력하세요")
 
     for item in event.target.files:
         read_text(item)
@@ -166,6 +160,8 @@ def search_data_in_pdf(pdfArrayBuffer, filename) -> None:
     """
     global search_data
     search_keyword: str = document.getElementById("search-input").value
+    if document.getElementById("search-input").value == "":
+        return
     total_count: int = 0
     for i in search_data:
         total_count += len(i)
@@ -218,6 +214,7 @@ def dragleave_handler(event) -> None:
 
 def search_button_handler(e) -> None:
     """검색 버튼 수신"""
+    e.preventDefault()
     global pdf_data
     if pdf_data == []:
         return
@@ -238,3 +235,6 @@ file_input.addEventListener('change', create_proxy(file_handler))
 
 search_button = document.getElementById("search-button")
 search_button.addEventListener('click', create_proxy(search_button_handler))
+
+form = document.querySelector('form')
+form.addEventListener('submit', create_proxy(search_button_handler))

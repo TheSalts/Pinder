@@ -9,7 +9,6 @@ function setPDF(arrayBuffer, page) {
     .getDocument(uint8Array)
     .promise.then((pdf) => {
       pdf.getPage(page).then(renderPage);
-      console.log("PDF 로드 성공");
     })
     .catch(function (error) {
       console.error("PDF 로드 실패", error);
@@ -26,12 +25,23 @@ function renderPage(page) {
   let viewport = page.getViewport({ scale: 1.5 });
   canvas.height = viewport.height;
   canvas.width = viewport.width;
-  document.getElementById("pdf-container").appendChild(canvas);
+  let pdfContainer = document.getElementById("pdf-container");
+  removeAllChildNodes(pdfContainer);
+  pdfContainer.appendChild(canvas);
   let renderContext = {
     canvasContext: ctx,
     viewport: viewport,
   };
   page.render(renderContext);
+}
+/**
+ *  모든 자식 요소 제거
+ * @param {HTMLElement} parent
+ */
+function removeAllChildNodes(parent) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
 }
 /**
  * PDF 이미지를 불러옵니다.
@@ -81,7 +91,6 @@ async function readImgListText(imgArray) {
     await Tesseract.recognize(img.url, "eng+kor")
       .then(({ data: { text } }) => {
         text = text.replace(/\s+/g, "");
-        console.log(text);
         if (text.includes(search_keyword)) renderPage(img.page);
         else return;
       })
