@@ -192,7 +192,7 @@ def search_data_in_pdf(pdfArrayBuffer, filename) -> None:
                     if page["filename"] == filename:
                         js.setPDF(pdfArrayBuffer, page["page"])  # pdf 렌더링
                         file_drop.remove()  # 파일 선택 제거
-                        file_input.remove()
+                        file_button.remove()
 
 
 def search_fail() -> None:
@@ -238,3 +238,7 @@ search_button.addEventListener('click', create_proxy(search_button_handler))
 
 form = document.querySelector('form')
 form.addEventListener('submit', create_proxy(search_button_handler))
+
+file_button = document.getElementById('file-upload-btn')
+file_button.addEventListener('click',
+                             create_proxy(lambda e: file_input.click()))

@@ -8,6 +8,8 @@ function setPDF(arrayBuffer, page) {
   pdfjsLib
     .getDocument(uint8Array)
     .promise.then((pdf) => {
+      let pdfContainer = document.getElementById("pdf-container");
+      removeAllChildNodes(pdfContainer);
       pdf.getPage(page).then(renderPage);
     })
     .catch(function (error) {
@@ -25,9 +27,7 @@ function renderPage(page) {
   let viewport = page.getViewport({ scale: 1.5 });
   canvas.height = viewport.height;
   canvas.width = viewport.width;
-  let pdfContainer = document.getElementById("pdf-container");
-  removeAllChildNodes(pdfContainer);
-  pdfContainer.appendChild(canvas);
+  document.getElementById("pdf-container").appendChild(canvas);
   let renderContext = {
     canvasContext: ctx,
     viewport: viewport,

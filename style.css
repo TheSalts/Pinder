@@ -63,3 +63,30 @@ body {
   border-color: #4285f4;
   background-color: #f1f1f1;
 }
+.file-upload-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 가운데 정렬을 위해 추가된 코드 */
+  gap: 10px;
+  font-family: "Arial", sans-serif;
+  /* 전체 화면의 높이를 차지하도록 설정하여 버튼이 수직 가운데에 오도록 합니다. */
+  flex-direction: column; /* 세로 방향으로 정렬되도록 변경 */
+}
+
+#file-upload-btn {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#file-upload-btn:hover {
+  background-color: #0056b3;
+}
+
+#file-name {
+  color: #555;
+}

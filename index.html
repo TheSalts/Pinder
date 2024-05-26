@@ -30,13 +30,10 @@
           id="search-input"
         />
         <br />
-        <input
-          type="file"
-          class="file-input"
-          id="file-input"
-          multiple
-          accept=".pdf"
-        />
+        <div class="file-upload-wrapper">
+          <input type="file" id="file-input" accept=".pdf" hidden />
+          <button type="button" id="file-upload-btn">파일 선택</button>
+        </div>
         <div class="file-drop" id="file-drop">
           파일 또는 폴더를 이곳에 끌어다 놓으세요
         </div>
